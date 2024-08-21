@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Color Palette</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- <link rel="stylesheet" href="styles.css">   -->
+
+    <style>
+      body {
+        background-color: #1e1e2f;
+        color: white;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      #container {
+        text-align: center;
+      }
+
+      h1 {
+        margin-bottom: 30px;
+        font-size: 24px;
+      }
+
+      button {
+        background-color: #ff4081;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 10px;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #e73370;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      label {
+        background-color: #ff4081;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 10px;
+        transition: background-color 0.3s ease;
+        display: inline-block;
+      }
+
+      label:hover {
+        background-color: #e73370;
+      }
+
+      #result {
+        margin-top: 20px;
+        font-size: 18px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .color-swatch {
+        width: 70px;
+        height: 60px;
+        border: 1px solid #ddd;
+        margin: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 12px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+  </style> 
+  </head>
+
+
+  <body>
+    <div id="container">
+      <h1>Create a Color Palette</h1>
+      <label for="file-upload">Choose Image</label>
+      <input type="file" id="file-upload" accept="image/*" />
+      <button id="create-palette">Create Color Palette</button>
+
+      <div id="result"></div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+      // Handle file input change
+        document.getElementById('file-upload').onchange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          selectedFile = file;
+          document.getElementById('result').innerText = 'Image Selected: ' + file.name;
+        }
+      };
+
+      // Function to get color palette from API
+        const getColorPallette = async (file) => {
+        try {
+          const formData = new FormData();
+          formData.append('image', file);
+
+          const response = await fetch("http://localhost:5150/api/process-image", {
+            method: 'POST',
+            body: formData,
+          });
+
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error('Error while fetching the color palette:', error);
+          document.getElementById('result').innerText = 'Error: ' + error;
+        }
+      };
+
+      // Handle "Create Color Palette" button click
+        document.getElementById('create-palette').onclick = async () => {
+          // if (selectedFile) {
+          //   const response = await getColorPallette(selectedFile);
+          //   const colorList = response.color_palette;
+          //   const paletteText = colorList.join(',\t'); // Use '\t' for tabs, or ' ' for spaces
+          //   document.getElementById('result').innerText = 'Color Palette: ' + paletteText;
+          // } 
+          // else {
+          // document.getElementById('result').innerText = 'Please select an image first.';
+          // }
+
+          if (selectedFile) {
+            const response = await getColorPallette(selectedFile);
+            const colorList = response.color_palette;
+            
+            // Display color swatches
+            const paletteContainer = document.getElementById('result');
+            paletteContainer.innerHTML = ''; // Clear previous content
+            
+            colorList.forEach(color => {
+              // Create a new div for each color swatch
+              const swatch = document.createElement('div');
+              swatch.className = 'color-swatch';
+              swatch.style.backgroundColor = color; // Apply the color
+              swatch.textContent = color; // Display color value inside the swatch
+              
+              // Append swatch to the container
+              paletteContainer.appendChild(swatch);
+            });
+          } else {
+            document.getElementById('result').innerText = 'Please select an image first.';
+          }
+
+      };
+
+      // Update palette display in the UI
+      // const updatePaletteDisplay = (palette) => {
+      //   const paletteContainer = document.getElementById('palette');
+      //   paletteContainer.innerHTML = ''; // Clear previous palette
+
+      //   palette.forEach(color => {
+      //     // Create a new paragraph for each color value
+      //     const colorText = document.createElement('p');
+      //     colorText.textContent = color; // Display color value as text
+      //     paletteContainer.appendChild(colorText);
+      //   });
+      // };
+
+      // Handle messages from the plugin code
+      // window.onmessage = (event) => {
+      //   const message = event.data.pluginMessage;
+      //   if (message.type === 'model-result') {
+      //     console.log('Deep Learning Model Result:', message.data);
+      //     // updatePaletteDisplay(message.data);
+      //   } else if (message.type === 'error') {
+      //     console.error('Error:', message.message);
+      //     document.getElementById('result').innerText = 'Error: ' + message.message;
+      //   }
+      // };                                                                                  
+    </script>
+  </body>
+</html>

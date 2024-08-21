@@ -1,0 +1,17 @@
+{
+  "name": "color-palette-gen.",
+  "id": "1408059248524081830",
+  "api": "1.0.0",
+  "main": "code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figma"
+  ],
+  "ui": "ui.html",
+  "networkAccess": {
+    "allowedDomains": ["*"],
+    "reasoning": "The plugin requires access to all domains for fetching necessary resources."
+  }
+}
